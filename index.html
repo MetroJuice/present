@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>時間とカレンダーと未来計算</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -17,13 +20,12 @@
                 <div id="calendar"></div>
             </section>
             <section class="right-section">
-                <h2>年齢と3年後の計算</h2>
+                <h2>年齢計算</h2>
                 <div class="age-input-container">
-                    <label for="birth-year">生年月日 (YYYY-MM-DD):</label>
+                    <label for="birth-date">生年月日を選択してください:</label>
                     <input type="date" id="birth-date">
-                    <button onclick="calculateFuture()">計算</button>
                 </div>
-                <div id="future-info"></div>
+                <div id="age-result"></div>
             </section>
         </main>
     </div>
@@ -107,39 +109,37 @@
         const today = new Date();
         renderCalendar(today.getFullYear(), today.getMonth());
 
-        // 3年後までの日数を計算
-        function calculateFuture() {
+        // 年齢を計算して表示する関数
+        function calculateAge() {
             const birthDateInput = document.getElementById('birth-date').value;
-            const futureInfoEl = document.getElementById('future-info');
+            const ageResultEl = document.getElementById('age-result');
 
             if (!birthDateInput) {
-                futureInfoEl.innerText = "生年月日を入力してください。";
+                ageResultEl.innerText = "生年月日を選択してください。";
                 return;
             }
 
             const birthDate = new Date(birthDateInput);
-            if (isNaN(birthDate.getTime())) {
-                futureInfoEl.innerText = "有効な生年月日を入力してください。";
+            if (isNaN(birthDate.getTime()) || birthDate > new Date()) {
+                ageResultEl.innerText = "未来の日付は選択できません。有効な生年月日を入力してください。";
                 return;
             }
 
-            const now = new Date();
-            const currentYear = now.getFullYear();
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDifference = today.getMonth() - birthDate.getMonth();
+            const dayDifference = today.getDate() - birthDate.getDate();
 
-            // 3年後の日付を計算 (誕生日が来る日付)
-            const threeYearsLater = new Date(birthDate);
-            threeYearsLater.setFullYear(birthDate.getFullYear() + 3);
-
-            // 今日から3年後の誕生日までの日数を計算
-            const diffTime = threeYearsLater.getTime() - now.getTime();
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-            if (diffDays >= 0) {
-                futureInfoEl.innerText = `3年後のあなたの誕生日まであと ${diffDays} 日です。`;
-            } else {
-                futureInfoEl.innerText = `3年後のあなたの誕生日は既に過ぎています。`;
+            // 今年の誕生日がまだ来ていない場合は、年齢を1歳引く
+            if (monthDifference < 0 || (monthDifference === 0 && dayDifference < 0)) {
+                age--;
             }
+
+            ageResultEl.innerText = `あなたの現在の年齢は ${age} 歳です。`;
         }
+
+        // 日付が選択されたら自動で年齢を計算する
+        document.getElementById('birth-date').addEventListener('input', calculateAge);
     </script>
 </body>
 </html>
