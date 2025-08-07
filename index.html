@@ -1,145 +1,200 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>時間とカレンダーと未来計算</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Present</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?display=swap&amp;family=Lexend:wght@400;500;700;900&amp;family=Noto+Sans+JP:wght@400;500;700;900" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <style type="text/tailwindcss">
+        :root {
+            --primary-color: #3d99f5;
+            --background-color: #f0f2f5;
+            --text-primary-color: #111418;
+            --text-secondary-color: #60758a;
+        }
+        body {
+            font-family: 'Lexend', 'Noto Sans JP', sans-serif;
+        }
+        .calendar-day-button:hover:not(.selected) {
+            @apply bg-gray-200;
+        }
+        .calendar-day-button.selected {
+            @apply bg-[var(--primary-color)] text-white;
+        }
+        .calendar-day-button.today {
+            @apply ring-2 ring-[var(--primary-color)];
+        }
+    </style>
 </head>
-<body>
-    <div class="container">
-        <header class="top-section">
-            <div id="current-time"></div>
-        </header>
-        <main class="bottom-section">
-            <section class="left-section">
-                <h2>カレンダー</h2>
-                <div id="calendar"></div>
+<body class="bg-[var(--background-color)]">
+    <div class="relative flex size-full min-h-screen flex-col justify-center group/design-root">
+        <main class="flex-grow flex flex-col justify-center items-center px-4 py-8">
+            <section class="text-center">
+                <p id="japanese-date" class="text-2xl text-[var(--text-primary-color)]">-</p>
+                <p id="western-date" class="text-base text-gray-500">-</p>
+                <p id="current-time" class="text-6xl font-bold text-[var(--primary-color)] mt-2">--:--:--</p>
             </section>
-            <section class="right-section">
-                <h2>年齢計算</h2>
-                <div class="age-input-container">
-                    <label for="birth-date">生年月日を選択してください:</label>
-                    <input type="date" id="birth-date">
+            <div class="flex flex-col md:flex-row gap-8 mt-8 w-full max-w-4xl">
+                <div class="flex-1">
+                    <div class="bg-white p-4 rounded-lg shadow-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <button id="prev-month-btn" class="p-2 rounded-full hover:bg-gray-100">
+                                <svg fill="currentColor" height="24px" viewBox="0 0 256 256" width="24px" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M165.66,202.34a8,8,0,0,1-11.32,11.32l-80-80a8,8,0,0,1,0-11.32l80-80a8,8,0,0,1,11.32,11.32L91.31,128Z"></path>
+                                </svg>
+                            </button>
+                            <p id="calendar-month-year" class="text-lg font-semibold text-[var(--text-primary-color)]">-</p>
+                            <button id="next-month-btn" class="p-2 rounded-full hover:bg-gray-100">
+                                <svg fill="currentColor" height="24px" viewBox="0 0 256 256" width="24px" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-7 gap-1 text-center">
+                            <div class="font-bold text-[var(--text-secondary-color)] py-2 text-sm">日</div>
+                            <div class="font-bold text-[var(--text-secondary-color)] py-2 text-sm">月</div>
+                            <div class="font-bold text-[var(--text-secondary-color)] py-2 text-sm">火</div>
+                            <div class="font-bold text-[var(--text-secondary-color)] py-2 text-sm">水</div>
+                            <div class="font-bold text-[var(--text-secondary-color)] py-2 text-sm">木</div>
+                            <div class="font-bold text-[var(--text-secondary-color)] py-2 text-sm">金</div>
+                            <div class="font-bold text-[var(--text-secondary-color)] py-2 text-sm">土</div>
+                        </div>
+                        <div id="calendar-grid" class="grid grid-cols-7 gap-1 text-center">
+                            <!-- Calendar days will be injected here -->
+                        </div>
+                    </div>
                 </div>
-                <div id="age-result"></div>
-            </section>
+                <div class="flex-1">
+                    <div class="bg-white p-4 rounded-lg shadow-sm h-full">
+                        <div class="h-full flex flex-col">
+                            <h2 class="text-lg font-bold text-[var(--text-primary-color)] mb-4">生年月日を選択</h2>
+                            <div class="flex-grow">
+                                <input type="date" id="birth-date-input" class="w-full p-2 border rounded-md focus:ring-2 focus:ring-[var(--primary-color)] focus:border-transparent">
+                            </div>
+                            <div class="border-t border-gray-200 mt-4 pt-4 text-center">
+                                <h3 class="text-base font-bold text-[var(--text-primary-color)]">年齢計算結果</h3>
+                                <p id="age-result" class="text-3xl font-bold text-[var(--primary-color)] mt-2">-</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
-
     <script>
-        // 現在時刻の表示
-        function updateTime() {
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = (now.getMonth() + 1).toString().padStart(2, '0');
-            const day = now.getDate().toString().padStart(2, '0');
-            const weekday = ['日曜', '月曜', '火曜', '水曜', '木曜', '金曜', '土曜'][now.getDay()];
-            const hours = now.getHours().toString().padStart(2, '0');
-            const minutes = now.getMinutes().toString().padStart(2, '0');
-            const seconds = now.getSeconds().toString().padStart(2, '0');
-
-            // 和暦の計算（簡略版）
-            let japaneseEra = '';
-            if (year >= 2019) {
-                japaneseEra = `令和${year - 2018}年`;
-            } else if (year >= 1989) {
-                japaneseEra = `平成${year - 1988}年`;
-            } else if (year >= 1926) {
-                japaneseEra = `昭和${year - 1925}年`;
-            } else if (year >= 1912) {
-                japaneseEra = `大正${year - 1911}年`;
-            } else if (year >= 1868) {
-                japaneseEra = `明治${year - 1867}年`;
-            }
-
-            document.getElementById('current-time').innerText =
-                `${japaneseEra}・${year}/${month}/${day} ${weekday} ${hours}:${minutes}:${seconds}`;
-        }
-        setInterval(updateTime, 1000);
-        updateTime(); // 初回表示
-
-        // カレンダーの表示
-        function renderCalendar(year, month) {
-            const calendarEl = document.getElementById('calendar');
-            calendarEl.innerHTML = ''; // クリア
-
-            const firstDayOfMonth = new Date(year, month, 1);
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-            const firstDayOfWeek = firstDayOfMonth.getDay(); // 0:日曜, 1:月曜...
-
-            const today = new Date();
-            const currentYear = today.getFullYear();
-            const currentMonth = today.getMonth();
-            const currentDay = today.getDay(); // 0:日曜, 1:月曜...
-
-            let calendarHtml = `<h3>${year}年 ${month + 1}月</h3>`;
-            calendarHtml += '<table>';
-            calendarHtml += '<thead><tr><th>日</th><th>月</th><th>火</th><th>水</th><th>木</th><th>金</th><th>土</th></tr></thead>';
-            calendarHtml += '<tbody>';
-
-            let dayCounter = 1;
-            for (let i = 0; i < 6; i++) { // 最大6週
-                calendarHtml += '<tr>';
-                for (let j = 0; j < 7; j++) {
-                    if (i === 0 && j < firstDayOfWeek) {
-                        calendarHtml += '<td></td>'; // 月初めまでの空白
-                    } else if (dayCounter > daysInMonth) {
-                        calendarHtml += '<td></td>'; // 月末以降の空白
-                    } else {
-                        const cellDate = new Date(year, month, dayCounter);
-                        const isToday = (cellDate.getFullYear() === today.getFullYear() &&
-                                         cellDate.getMonth() === today.getMonth() &&
-                                         cellDate.getDate() === today.getDate());
-                        const todayClass = isToday ? 'today' : '';
-                        calendarHtml += `<td class="${todayClass}">${dayCounter}</td>`;
-                        dayCounter++;
-                    }
-                }
-                calendarHtml += '</tr>';
-                if (dayCounter > daysInMonth) break; // 月の終わり
-            }
-            calendarHtml += '</tbody></table>';
-            calendarEl.innerHTML = calendarHtml;
-        }
-
-        const today = new Date();
-        renderCalendar(today.getFullYear(), today.getMonth());
-
-        // 年齢を計算して表示する関数
-        function calculateAge() {
-            const birthDateInput = document.getElementById('birth-date').value;
+        document.addEventListener('DOMContentLoaded', () => {
+            const japaneseDateEl = document.getElementById('japanese-date');
+            const westernDateEl = document.getElementById('western-date');
+            const currentTimeEl = document.getElementById('current-time');
+            const calendarMonthYearEl = document.getElementById('calendar-month-year');
+            const calendarGridEl = document.getElementById('calendar-grid');
+            const prevMonthBtn = document.getElementById('prev-month-btn');
+            const nextMonthBtn = document.getElementById('next-month-btn');
+            const birthDateInput = document.getElementById('birth-date-input');
             const ageResultEl = document.getElementById('age-result');
 
-            if (!birthDateInput) {
-                ageResultEl.innerText = "生年月日を選択してください。";
-                return;
+            let currentCalendarDate = new Date();
+
+            // --- 1. Real-time Clock ---
+            function updateTime() {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = (now.getMonth() + 1).toString().padStart(2, '0');
+                const day = now.getDate().toString().padStart(2, '0');
+                const weekday = ['日', '月', '火', '水', '木', '金', '土'][now.getDay()];
+
+                let japaneseEra = '';
+                if (year >= 2019) {
+                    japaneseEra = `令和${year - 2018}年`;
+                } else if (year >= 1989) {
+                    japaneseEra = `平成${year - 1988}年`;
+                } else if (year >= 1926) {
+                    japaneseEra = `昭和${year - 1925}年`;
+                } else {
+                    japaneseEra = `${year}年`;
+                }
+
+                japaneseDateEl.innerText = `${japaneseEra} ${month}月${day}日`;
+                westernDateEl.innerText = `${year}年${month}月${day}日 (${weekday})`;
+                currentTimeEl.innerText = now.toLocaleTimeString('ja-JP');
+            }
+            setInterval(updateTime, 1000);
+            updateTime();
+
+            // --- 2. Dynamic Calendar ---
+            function renderCalendar(date) {
+                const year = date.getFullYear();
+                const month = date.getMonth();
+
+                calendarMonthYearEl.innerText = `${year}年 ${month + 1}月`;
+
+                calendarGridEl.innerHTML = ''; // Clear previous calendar days
+
+                const firstDayOfMonth = new Date(year, month, 1);
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const firstDayOfWeek = firstDayOfMonth.getDay();
+
+                // Add placeholders for alignment
+                for (let i = 0; i < firstDayOfWeek; i++) {
+                    const placeholder = document.createElement('div');
+                    calendarGridEl.appendChild(placeholder);
+                }
+
+                const today = new Date();
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dayButton = document.createElement('button');
+                    dayButton.className = 'h-9 w-9 flex items-center justify-center rounded-full text-sm font-medium calendar-day-button';
+                    dayButton.innerText = day;
+
+                    if (year === today.getFullYear() && month === today.getMonth() && day === today.getDate()) {
+                        dayButton.classList.add('today');
+                    }
+
+                    calendarGridEl.appendChild(dayButton);
+                }
             }
 
-            const birthDate = new Date(birthDateInput);
-            if (isNaN(birthDate.getTime()) || birthDate > new Date()) {
-                ageResultEl.innerText = "未来の日付は選択できません。有効な生年月日を入力してください。";
-                return;
+            prevMonthBtn.addEventListener('click', () => {
+                currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+                renderCalendar(currentCalendarDate);
+            });
+
+            nextMonthBtn.addEventListener('click', () => {
+                currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+                renderCalendar(currentCalendarDate);
+            });
+
+            renderCalendar(currentCalendarDate);
+
+            // --- 3. Age Calculator ---
+            function calculateAge() {
+                const birthDateValue = birthDateInput.value;
+                if (!birthDateValue) {
+                    ageResultEl.innerText = '-';
+                    return;
+                }
+
+                const birthDate = new Date(birthDateValue);
+                if (isNaN(birthDate.getTime()) || birthDate > new Date()) {
+                    ageResultEl.innerText = '無効';
+                    return;
+                }
+
+                const today = new Date();
+                let age = today.getFullYear() - birthDate.getFullYear();
+                const monthDifference = today.getMonth() - birthDate.getMonth();
+                const dayDifference = today.getDate() - birthDate.getDate();
+
+                if (monthDifference < 0 || (monthDifference === 0 && dayDifference < 0)) {
+                    age--;
+                }
+                ageResultEl.innerText = `${age}歳`;
             }
 
-            const today = new Date();
-            let age = today.getFullYear() - birthDate.getFullYear();
-            const monthDifference = today.getMonth() - birthDate.getMonth();
-            const dayDifference = today.getDate() - birthDate.getDate();
-
-            // 今年の誕生日がまだ来ていない場合は、年齢を1歳引く
-            if (monthDifference < 0 || (monthDifference === 0 && dayDifference < 0)) {
-                age--;
-            }
-
-            ageResultEl.innerText = `あなたの現在の年齢は ${age} 歳です。`;
-        }
-
-        // 日付が選択されたら自動で年齢を計算する
-        document.getElementById('birth-date').addEventListener('input', calculateAge);
+            birthDateInput.addEventListener('input', calculateAge);
+        });
     </script>
 </body>
 </html>
