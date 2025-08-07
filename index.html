@@ -24,61 +24,64 @@
             @apply bg-[var(--primary-color)] text-white;
         }
         .calendar-day-button.today {
-            @apply ring-2 ring-[var(--primary-color)];
+            @apply font-bold text-[var(--primary-color)] ring-2 ring-[var(--primary-color)];
+        }
+        .dark .calendar-day-button.today {
+            @apply text-blue-400 ring-blue-400;
         }
     </style>
 </head>
-<body class="bg-[var(--background-color)]">
+<body class="bg-[var(--background-color)] dark:bg-gray-900">
     <div class="relative flex size-full min-h-screen flex-col justify-center group/design-root">
         <main class="flex-grow flex flex-col justify-center items-center px-4 py-8">
-            <div class="bg-white p-6 rounded-lg shadow-sm w-full max-w-4xl mb-8">
+            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm w-full max-w-4xl mb-8">
                 <section class="text-center">
-                    <p id="japanese-date" class="text-2xl text-[var(--text-primary-color)]">-</p>
-                    <p id="western-date" class="text-base text-gray-500">-</p>
-                    <p id="current-time" class="text-6xl font-bold text-[var(--primary-color)] mt-2 font-mono">--:--:--</p>
+                    <p id="japanese-date" class="text-2xl text-[var(--text-primary-color)] dark:text-gray-200">-</p>
+                    <p id="western-date" class="text-base text-gray-500 dark:text-gray-400">-</p>
+                    <p id="current-time" class="text-6xl font-bold text-[var(--primary-color)] dark:text-blue-400 mt-2 font-mono">--:--:--</p>
                 </section>
             </div>
             <div class="flex flex-col md:flex-row gap-8 w-full max-w-4xl">
-                <div class="flex-1">
-                    <div class="bg-white p-4 rounded-lg shadow-sm">
+                <div class="w-full md:w-1/2">
+                    <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
                         <div class="flex items-center justify-between mb-4">
-                            <button id="prev-month-btn" class="p-2 rounded-full hover:bg-gray-100">
-                                <svg fill="currentColor" height="24px" viewBox="0 0 256 256" width="24px" xmlns="http://www.w3.org/2000/svg">
+                            <button id="prev-month-btn" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <svg class="text-gray-600 dark:text-gray-300" fill="currentColor" height="24px" viewBox="0 0 256 256" width="24px" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M165.66,202.34a8,8,0,0,1-11.32,11.32l-80-80a8,8,0,0,1,0-11.32l80-80a8,8,0,0,1,11.32,11.32L91.31,128Z"></path>
                                 </svg>
                             </button>
-                            <p id="calendar-month-year" class="text-lg font-semibold text-[var(--text-primary-color)]">-</p>
-                            <button id="next-month-btn" class="p-2 rounded-full hover:bg-gray-100">
-                                <svg fill="currentColor" height="24px" viewBox="0 0 256 256" width="24px" xmlns="http://www.w3.org/2000/svg">
+                            <p id="calendar-month-year" class="text-lg font-semibold text-[var(--text-primary-color)] dark:text-gray-200">-</p>
+                            <button id="next-month-btn" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <svg class="text-gray-600 dark:text-gray-300" fill="currentColor" height="24px" viewBox="0 0 256 256" width="24px" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"></path>
                                 </svg>
                             </button>
                         </div>
                         <div class="grid grid-cols-7 gap-1 text-center">
-                            <div class="font-bold text-[var(--text-secondary-color)] py-2 text-sm">日</div>
-                            <div class="font-bold text-[var(--text-secondary-color)] py-2 text-sm">月</div>
-                            <div class="font-bold text-[var(--text-secondary-color)] py-2 text-sm">火</div>
-                            <div class="font-bold text-[var(--text-secondary-color)] py-2 text-sm">水</div>
-                            <div class="font-bold text-[var(--text-secondary-color)] py-2 text-sm">木</div>
-                            <div class="font-bold text-[var(--text-secondary-color)] py-2 text-sm">金</div>
-                            <div class="font-bold text-[var(--text-secondary-color)] py-2 text-sm">土</div>
+                            <div class="font-bold text-[var(--text-secondary-color)] dark:text-gray-400 py-2 text-sm">日</div>
+                            <div class="font-bold text-[var(--text-secondary-color)] dark:text-gray-400 py-2 text-sm">月</div>
+                            <div class="font-bold text-[var(--text-secondary-color)] dark:text-gray-400 py-2 text-sm">火</div>
+                            <div class="font-bold text-[var(--text-secondary-color)] dark:text-gray-400 py-2 text-sm">水</div>
+                            <div class="font-bold text-[var(--text-secondary-color)] dark:text-gray-400 py-2 text-sm">木</div>
+                            <div class="font-bold text-[var(--text-secondary-color)] dark:text-gray-400 py-2 text-sm">金</div>
+                            <div class="font-bold text-[var(--text-secondary-color)] dark:text-gray-400 py-2 text-sm">土</div>
                         </div>
                         <div id="calendar-grid" class="grid grid-cols-7 gap-1 text-center">
                             <!-- Calendar days will be injected here -->
                         </div>
                     </div>
                 </div>
-                <div class="flex-1">
-                    <div class="bg-white p-4 rounded-lg shadow-sm h-full">
+                <div class="w-full md:w-1/2">
+                    <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm h-full">
                         <div class="h-full flex flex-col">
-                            <h2 class="text-lg font-bold text-[var(--text-primary-color)] mb-4">生年月日を選択</h2>
+                            <h2 class="text-lg font-bold text-[var(--text-primary-color)] dark:text-gray-200 mb-4">生年月日を選択</h2>
                             <div class="flex-grow">
-                                <input type="date" id="birth-date-input" class="w-full p-2 border rounded-md focus:ring-2 focus:ring-[var(--primary-color)] focus:border-transparent">
+                                <input type="date" id="birth-date-input" class="w-full p-2 border rounded-md focus:ring-2 focus:ring-[var(--primary-color)] focus:border-transparent dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600">
                             </div>
-                            <div class="border-t border-gray-200 mt-4 pt-4">
+                            <div class="border-t border-gray-200 dark:border-gray-700 mt-4 pt-4">
                                 <div class="flex justify-between items-center">
-                                    <h3 class="text-lg font-bold text-[var(--text-primary-color)]">年齢</h3>
-                                    <p id="age-result" class="text-3xl font-bold text-[var(--primary-color)] font-mono">-</p>
+                                    <h3 class="text-lg font-bold text-[var(--text-primary-color)] dark:text-gray-200">年齢</h3>
+                                    <p id="age-result" class="text-5xl font-bold text-[var(--primary-color)] dark:text-blue-400 font-mono">-</p>
                                 </div>
                             </div>
                         </div>
@@ -149,7 +152,7 @@
                 const today = new Date();
                 for (let day = 1; day <= daysInMonth; day++) {
                     const dayButton = document.createElement('button');
-                    dayButton.className = 'h-9 w-9 flex items-center justify-center rounded-full text-sm font-medium calendar-day-button';
+                    dayButton.className = 'h-9 w-9 flex items-center justify-center rounded-full text-sm font-medium calendar-day-button text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700';
                     dayButton.innerText = day;
 
                     if (year === today.getFullYear() && month === today.getMonth() && day === today.getDate()) {
